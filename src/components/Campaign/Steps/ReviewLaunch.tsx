@@ -97,6 +97,23 @@ const ReviewLaunch: React.FC<Props> = ({ data, onLaunch }) => {
     return null;
   };
 
+  const handleLaunch = () => {
+    try {
+      // Update campaign status to "completed"
+      const updatedData = { ...data, status: 'completed' };
+
+      // Save campaign data to local storage
+      const campaigns = JSON.parse(localStorage.getItem('campaigns') || '[]');
+      campaigns.push(updatedData);
+      localStorage.setItem('campaigns', JSON.stringify(campaigns));
+
+      // Call the onLaunch callback
+      onLaunch();
+    } catch (error) {
+      console.error('Error launching campaign:', error);
+    }
+  };
+
   return (
     <div className="max-w-3xl">
       <Card className="mb-6">
@@ -204,7 +221,7 @@ const ReviewLaunch: React.FC<Props> = ({ data, onLaunch }) => {
                 <br />
                 <small>
                   {rule.trigger.delay} {rule.trigger.delayUnit} after{' '}
-                  {rule.trigger.type === 'no_response' ? 'no response' : rule.trigger.type}
+                  {rule.trigger.type === 'no_reply' ? 'no reply' : rule.trigger.type}
                 </small>
               </Timeline.Item>
             ))}
@@ -225,7 +242,7 @@ const ReviewLaunch: React.FC<Props> = ({ data, onLaunch }) => {
             type="primary"
             size="large"
             disabled={checkResults.errors.length > 0 || isChecking}
-            onClick={onLaunch}
+            onClick={handleLaunch}
           >
             Launch Campaign
           </Button>

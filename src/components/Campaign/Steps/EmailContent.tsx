@@ -52,8 +52,8 @@ const EmailContent: React.FC<Props> = ({ data, onUpdate }) => {
     checkSpamScore(values.subject, values.content);
   };
 
-  const detectVariables = (content: string): string[] => {
-    const matches = content.match(/{{([^}]+)}}/g) || [];
+  const detectVariables = (content: string | undefined): string[] => {
+    const matches = content ? content.match(/{{([^}]+)}}/g) || [] : [];
     return matches.map(match => match.slice(2, -2).trim());
   };
 
@@ -161,20 +161,22 @@ const EmailContent: React.FC<Props> = ({ data, onUpdate }) => {
         </TabPane>
 
         <TabPane tab="HTML Editor" key="html">
-          <Alert
-            message="Advanced Editor"
-            description="Use HTML to create more sophisticated email templates with custom styling."
-            type="info"
-            showIcon
-            className="mb-4"
-          />
-          <Form.Item name="htmlContent">
-            <TextArea
-              rows={20}
-              placeholder="<html><body>Your HTML content here...</body></html>"
-            />
-          </Form.Item>
-        </TabPane>
+  <Alert
+    message="Advanced Editor"
+    description="Use HTML to create more sophisticated email templates with custom styling."
+    type="info"
+    showIcon
+    className="mb-4"
+  />
+  <Form form={form} layout="vertical">
+    <Form.Item name="htmlContent">
+      <TextArea
+        rows={20}
+        placeholder="<html><body>Your HTML content here...</body></html>"
+      />
+    </Form.Item>
+  </Form>
+</TabPane>
 
         <TabPane tab="Preview" key="preview">
           <Card title="Desktop Preview" className="mb-4">

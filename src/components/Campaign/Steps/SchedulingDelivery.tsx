@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, DatePicker, TimePicker, Select, InputNumber, Switch, Card, Alert } from 'antd';
 import type { Campaign, ScheduleSettings } from '../../../types/campaign';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import debounce from 'lodash/debounce';
+import ErrorBoundary from './ErrorBoundary'; // Adjust the import path as necessary
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -19,7 +21,7 @@ interface Props {
 const SchedulingDelivery: React.FC<Props> = ({ data, onUpdate }) => {
   const [form] = Form.useForm();
 
-  const timeZones = Intl.supportedValuesOf('timeZone');
+  const timeZones = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const workingDays = [
     { label: 'Monday', value: 1 },
     { label: 'Tuesday', value: 2 },
@@ -30,31 +32,59 @@ const SchedulingDelivery: React.FC<Props> = ({ data, onUpdate }) => {
     { label: 'Sunday', value: 0 },
   ];
 
-  const handleFormChange = () => {
-    const values = form.getFieldsValue();
-    const schedule: ScheduleSettings = {
-      startDate: values.dateRange[0].toDate(),
-      endDate: values.dateRange[1].toDate(),
-      timeZone: values.timeZone,
-      sendingSpeed: {
-        emailsPerHour: values.emailsPerHour,
-        batchSize: values.batchSize,
-        delayBetweenBatches: values.delayBetweenBatches,
-      },
-      optimizeDeliveryTime: values.optimizeDeliveryTime,
-      workingHours: {
-        start: values.workingHours[0].format('HH:mm'),
-        end: values.workingHours[1].format('HH:mm'),
-        days: values.workingDays,
-      },
-    };
-    onUpdate({ schedule });
-  };
+  useEffect(() => {
+    form.setFieldsValue(data.schedule);
+  }, [form, data]);
+
+  const handleFormChange = debounce(() => {
+    try {
+      const values = form.getFieldsValue();
+      localStorage.setItem('schedulingDeliveryForm', JSON.stringify(values));
+
+      if (!values.dateRange || !values.dateRange[0] || !values.dateRange[1]) {
+        console.error('Date range is not defined or incomplete');
+        return;
+      }
+
+      if (!values.workingHours || !values.workingHours[0] || !values.workingHours[1]) {
+        console.error('Working hours are not defined or incomplete');
+        return;
+      }
+
+      const schedule: ScheduleSettings = {
+        startDate: values.dateRange[0].toDate(),
+        endDate: values.dateRange[1].toDate(),
+        timeZone: values.timeZone,
+        sendingSpeed: {
+          emailsPerHour: values.emailsPerHour,
+          batchSize: values.batchSize,
+          delayBetweenBatches: values.delayBetweenBatches,
+        },
+        optimizeDeliveryTime: values.optimizeDeliveryTime,
+        workingHours: {
+          start: values.workingHours[0].format('HH:mm'),
+          end: values.workingHours[1].format('HH:mm'),
+          days: values.workingDays,
+        },
+      };
+      onUpdate({ schedule });
+    } catch (error) {
+      console.error('Error in handleFormChange:', error);
+    }
+  }, 500);
 
   const calculateDailyLimit = () => {
-    const values = form.getFieldsValue();
-    const hoursPerDay = dayjs(values.workingHours[1]).diff(dayjs(values.workingHours[0]), 'hour', true);
-    return Math.floor(values.emailsPerHour * hoursPerDay);
+    try {
+      const values = form.getFieldsValue();
+      if (!values.workingHours || !values.workingHours[0] || !values.workingHours[1]) {
+        return 0;
+      }
+      const hoursPerDay = dayjs(values.workingHours[1]).diff(dayjs(values.workingHours[0]), 'hour', true);
+      return Math.floor(values.emailsPerHour * hoursPerDay);
+    } catch (error) {
+      console.error('Error in calculateDailyLimit:', error);
+      return 0;
+    }
   };
 
   return (
@@ -64,7 +94,7 @@ const SchedulingDelivery: React.FC<Props> = ({ data, onUpdate }) => {
         layout="vertical"
         initialValues={{
           dateRange: [dayjs(), dayjs().add(7, 'days')],
-          timeZone: dayjs.tz.guess(),
+          timeZone: timeZones,
           emailsPerHour: 50,
           batchSize: 10,
           delayBetweenBatches: 5,
@@ -96,12 +126,10 @@ const SchedulingDelivery: React.FC<Props> = ({ data, onUpdate }) => {
               showSearch
               placeholder="Select campaign time zone"
               filterOption={(input, option) =>
-                option?.children.toString().toLowerCase().includes(input.toLowerCase())
+                option?.children?.toString().toLowerCase().includes(input.toLowerCase()) !== false
               }
             >
-              {timeZones.map(tz => (
-                <Option key={tz} value={tz}>{tz}</Option>
-              ))}
+              <Option key={timeZones} value={timeZones}>{timeZones}</Option>
             </Select>
           </Form.Item>
         </Card>
@@ -197,4 +225,10 @@ const SchedulingDelivery: React.FC<Props> = ({ data, onUpdate }) => {
   );
 };
 
-export default SchedulingDelivery;
+const WrappedSchedulingDelivery: React.FC<Props> = (props) => (
+  <ErrorBoundary>
+    <SchedulingDelivery {...props} />
+  </ErrorBoundary>
+);
+
+export default WrappedSchedulingDelivery;

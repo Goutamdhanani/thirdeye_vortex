@@ -1,6 +1,5 @@
-// src/components/Sidebar.tsx
 import React from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Badge, Switch, Avatar, Tooltip } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   DashboardOutlined,
@@ -8,12 +7,24 @@ import {
   TeamOutlined,
   FileTextOutlined,
   BarChartOutlined,
+  MailOutlined,
   SettingOutlined,
+  BulbOutlined,
+  QuestionCircleOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import './Sidebar.css';
 
 const { Sider } = Layout;
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  collapsed: boolean;
+  onCollapse: (collapsed: boolean) => void;
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, darkMode, toggleDarkMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,12 +36,12 @@ const Sidebar: React.FC = () => {
     },
     {
       key: '/campaigns',
-      icon: <RocketOutlined />,
+      icon: <Badge count={3}><RocketOutlined /></Badge>,
       label: 'Campaigns',
     },
     {
       key: '/leads',
-      icon: <TeamOutlined />,
+      icon: <Badge count={12}><TeamOutlined /></Badge>,
       label: 'Leads',
     },
     {
@@ -44,6 +55,11 @@ const Sidebar: React.FC = () => {
       label: 'Analytics',
     },
     {
+      key: '/mail',
+      icon: <Badge count={5}><MailOutlined /></Badge>,
+      label: 'Mail',
+    },
+    {
       key: '/settings',
       icon: <SettingOutlined />,
       label: 'Settings',
@@ -52,20 +68,37 @@ const Sidebar: React.FC = () => {
 
   return (
     <Sider
-      theme="light"
-      className="border-r border-gray-200"
-      width={220}
+      collapsible
+      collapsed={collapsed}
+      onCollapse={onCollapse}
+      width={280}
+      className="sidebar"
+      trigger={null} // Remove the default blue collapse button
     >
-      <div className="h-16 flex items-center justify-center border-b border-gray-200">
-        <h1 className="text-xl font-bold text-primary">ThirdMailCRM</h1>
+      <div className="logo">
+        <Avatar size="large" icon={<MailOutlined />} />
+        {!collapsed && <span className="logo-text">MyApp</span>}
       </div>
       <Menu
+        theme="light"
         mode="inline"
         selectedKeys={[location.pathname]}
-        className="sidebar-menu"
         items={menuItems}
         onClick={({ key }) => navigate(key)}
+        className="sidebar-menu"
       />
+      <div className="sidebar-footer">
+        <Tooltip title="Toggle Dark Mode">
+          <Switch
+            checked={darkMode}
+            onChange={toggleDarkMode}
+            className="theme-switch"
+            checkedChildren="Dark"
+            unCheckedChildren="Light"
+            icon={<BulbOutlined />}
+          />
+        </Tooltip>
+      </div>
     </Sider>
   );
 };

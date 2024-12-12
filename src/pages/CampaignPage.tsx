@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Table, Button, Select, Input, Tag, Card, Modal, Form, message, Space, Drawer, Descriptions, Tooltip, Row, Col } from 'antd';
-import { InboxOutlined, DeleteOutlined, FilterOutlined, UploadOutlined, EyeOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import type { Campaign, Lead } from '../../../types/campaign';
-import { getLeads, addLeads, deleteLead } from '../../../store/leadStore';
-import { parseFile } from '../../../utils/dataProcessing';
-import { showUploadSummary } from '../../../components/Notifications';
+import { Button, Table, Upload, message, Space, Modal, Drawer, Descriptions, Select, Form, Tooltip, Row, Col } from 'antd';
+import { PlusOutlined, UploadOutlined, DeleteOutlined, EyeOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { UploadFile } from 'antd/lib/upload/interface';
+import { parseFile } from '../utils/dataProcessing';
+import { addLeads, getLeads, deleteLead } from '../store/leadStore';
+import { showUploadSummary } from '../components/Notifications';
+import SearchFilterExport from '../components/SearchFilterExport'; // Ensure this import is correct
+import '../styles/app.css';
 
-const { Dragger } = Upload;
 const { Option } = Select;
 
-interface Props {
-  data: Partial<Campaign>;
-  onUpdate: (data: Partial<Campaign>) => void;
+interface Lead {
+  id: string;
+  [key: string]: any;
 }
 
-const AudienceSetup: React.FC<Props> = ({ data, onUpdate }) => {
+const CampaignPage: React.FC = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -130,9 +131,10 @@ const AudienceSetup: React.FC<Props> = ({ data, onUpdate }) => {
   }));
 
   return (
-    <Card title="Audience Setup">
-      <Form layout="vertical">
-        <Form.Item label="Leads Upload">
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Create New Campaign</h1>
+        <Space>
           <Upload
             multiple
             fileList={fileList}
@@ -159,49 +161,50 @@ const AudienceSetup: React.FC<Props> = ({ data, onUpdate }) => {
           >
             Delete Selected
           </Button>
-        </Form.Item>
-        <Table
-          rowSelection={rowSelection}
-          columns={[
-            {
-              title: 'Name',
-              dataIndex: 'name',
-              key: 'name',
-              ellipsis: true,
-            },
-            {
-              title: 'Email',
-              dataIndex: 'email',
-              key: 'email',
-              ellipsis: true,
-            },
-            {
-              title: 'Company',
-              dataIndex: 'company',
-              key: 'company',
-              ellipsis: true,
-            },
-            {
-              title: 'Phone',
-              dataIndex: 'phone',
-              key: 'phone',
-              ellipsis: true,
-            },
-            {
-              title: 'Actions',
-              key: 'actions',
-              render: (_: any, record: Lead) => (
-                <Space size="middle">
-                  <Button type="link" icon={<EyeOutlined />} onClick={() => showDrawer(record)} />
-                  <Button type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
-                </Space>
-              ),
-            },
-          ]}
-          dataSource={leads}
-          rowKey="id"
-        />
-      </Form>
+        </Space>
+      </div>
+      <SearchFilterExport />
+      <Table
+        rowSelection={rowSelection}
+        columns={[
+          {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            ellipsis: true,
+          },
+          {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+            ellipsis: true,
+          },
+          {
+            title: 'Company',
+            dataIndex: 'company',
+            key: 'company',
+            ellipsis: true,
+          },
+          {
+            title: 'Phone',
+            dataIndex: 'phone',
+            key: 'phone',
+            ellipsis: true,
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            render: (_: any, record: Lead) => (
+              <Space size="middle">
+                <Button type="link" icon={<EyeOutlined />} onClick={() => showDrawer(record)} />
+                <Button type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
+              </Space>
+            ),
+          },
+        ]}
+        dataSource={leads}
+        rowKey="id"
+      />
       <Drawer
         title="Lead Details"
         width={640}
@@ -256,8 +259,8 @@ const AudienceSetup: React.FC<Props> = ({ data, onUpdate }) => {
           </Row>
         </Form>
       </Modal>
-    </Card>
+    </div>
   );
 };
 
-export default AudienceSetup;
+export default CampaignPage;

@@ -1,13 +1,39 @@
-import React from 'react';
-import { Button, Table, Tag, Space } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Table, Tag, Space, Modal, Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { PlusOutlined } from '@ant-design/icons';
-import { useCampaignStore } from '../store/campaignStore';
-import type { Campaign } from '../store/campaignStore';
+import { PlusOutlined, EditOutlined, EyeOutlined, DeleteOutlined, PauseOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { Campaign } from '../store/campaignStore';
 
 const CampaignsPage: React.FC = () => {
   const navigate = useNavigate();
-  const campaigns = useCampaignStore((state) => state.campaigns);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+
+  useEffect(() => {
+    // Load campaign data from local storage
+    const savedCampaigns = localStorage.getItem('campaigns');
+    if (savedCampaigns) {
+      setCampaigns(JSON.parse(savedCampaigns));
+    }
+  }, []);
+
+  const handleStatusToggle = (id: string) => {
+    const updatedCampaigns = campaigns.map((campaign) =>
+      campaign.id === id ? { ...campaign, status: campaign.status === 'active' ? 'paused' : 'active' } : campaign
+    );
+    localStorage.setItem('campaigns', JSON.stringify(updatedCampaigns));
+    setCampaigns(updatedCampaigns);
+  };
+
+  const handleDelete = (id: string) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this campaign?',
+      onOk: () => {
+        const updatedCampaigns = campaigns.filter((campaign) => campaign.id !== id);
+        localStorage.setItem('campaigns', JSON.stringify(updatedCampaigns));
+        setCampaigns(updatedCampaigns);
+      },
+    });
+  };
 
   const columns = [
     {
@@ -57,12 +83,18 @@ const CampaignsPage: React.FC = () => {
       key: 'actions',
       render: (_: any, record: Campaign) => (
         <Space size="middle">
-          <Button type="link" onClick={() => navigate(`/campaigns/${record.id}`)}>
-            View
-          </Button>
-          <Button type="link" onClick={() => navigate(`/campaigns/${record.id}/edit`)}>
-            Edit
-          </Button>
+          <Tooltip title="View">
+            <Button type="link" icon={<EyeOutlined />} onClick={() => navigate(`/campaigns/${record.id}`)} />
+          </Tooltip>
+          <Tooltip title="Edit">
+            <Button type="link" icon={<EditOutlined />} onClick={() => navigate(`/campaigns/${record.id}/edit`)} />
+          </Tooltip>
+          <Tooltip title={record.status === 'active' ? 'Pause' : 'Activate'}>
+            <Button type="link" icon={record.status === 'active' ? <PauseOutlined /> : <PlayCircleOutlined />} onClick={() => handleStatusToggle(record.id)} />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <Button type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
+          </Tooltip>
         </Space>
       ),
     },

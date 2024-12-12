@@ -2,6 +2,44 @@ import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import type { Campaign } from '../types/campaign';
 
+export interface FollowUpRule {
+  id: string;
+  name: string;
+  trigger: {
+    type: 'no_reply' | 'opened' | 'clicked' | 'not_opened';
+    delay: number;
+    delayUnit: string;
+  };
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  status: 'active' | 'paused' | 'completed';
+  progress: number;
+  sent: number;
+  click: number;
+  replied: number;
+  opportunities: number;
+  schedule: {
+    startDate: string;
+    endDate: string;
+    timeZone: string;
+  };
+  abTest?: {
+    enabled: boolean;
+    type: string;
+    variants: any[];
+    testDuration: number;
+  };
+  followUpRules?: FollowUpRule[];
+  template?: {
+    subject: string;
+    content: string;
+  };
+  leads?: any[];
+}
+
 interface CampaignStore {
   campaigns: Campaign[];
   draftCampaign: Partial<Campaign> | null;
@@ -11,6 +49,7 @@ interface CampaignStore {
   setDraftCampaign: (campaign: Partial<Campaign> | null) => void;
   updateDraftCampaign: (data: Partial<Campaign>) => void;
   saveDraftCampaign: () => void;
+  fetchCampaigns: () => void; // Add fetchCampaigns to the interface
 }
 
 export const useCampaignStore = create<CampaignStore>((set) => ({
@@ -83,4 +122,11 @@ export const useCampaignStore = create<CampaignStore>((set) => ({
         draftCampaign: null,
       };
     }),
+
+  fetchCampaigns: async () => {
+    // Fetch campaigns from an API or other source
+    const response = await fetch('/api/campaigns');
+    const data = await response.json();
+    set({ campaigns: data });
+  },
 }));

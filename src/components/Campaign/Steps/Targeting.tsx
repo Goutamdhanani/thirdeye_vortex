@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Table, Button, Select, Input, Tag, Card, Modal, Form, message, Space, Drawer, Descriptions, Tooltip, Row, Col } from 'antd';
-import { InboxOutlined, DeleteOutlined, FilterOutlined, UploadOutlined, EyeOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import type { Campaign, Lead } from '../../../types/campaign';
-import { getLeads, addLeads, deleteLead } from '../../../store/leadStore';
+import { Form, Select, Card, Upload, Button, message, Table, Space, Modal, Drawer, Descriptions, Tooltip, Row, Col } from 'antd';
+import { UploadOutlined, DeleteOutlined, EyeOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { UploadFile } from 'antd/lib/upload/interface';
 import { parseFile } from '../../../utils/dataProcessing';
+import { addLeads, getLeads, deleteLead } from '../../../store/leadStore';
 import { showUploadSummary } from '../../../components/Notifications';
+import type { Campaign } from '../../../types/campaign';
 
-const { Dragger } = Upload;
 const { Option } = Select;
+
+interface Lead {
+  id: string;
+  [key: string]: any;
+}
 
 interface Props {
   data: Partial<Campaign>;
   onUpdate: (data: Partial<Campaign>) => void;
 }
 
-const AudienceSetup: React.FC<Props> = ({ data, onUpdate }) => {
+const Targeting: React.FC<Props> = ({ data, onUpdate }) => {
+  const [form] = Form.useForm();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -130,8 +136,8 @@ const AudienceSetup: React.FC<Props> = ({ data, onUpdate }) => {
   }));
 
   return (
-    <Card title="Audience Setup">
-      <Form layout="vertical">
+    <Card title="Targeting">
+      <Form form={form} layout="vertical">
         <Form.Item label="Leads Upload">
           <Upload
             multiple
@@ -260,4 +266,4 @@ const AudienceSetup: React.FC<Props> = ({ data, onUpdate }) => {
   );
 };
 
-export default AudienceSetup;
+export default Targeting;
