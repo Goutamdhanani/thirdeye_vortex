@@ -1,50 +1,62 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
 ```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+---
+**ThirdEye Vertex**
+## **Overview**  
+ThirdEye Vertex is a cutting-edge web application built using **React**, **TypeScript**, and **Vite**, designed to deliver fast, scalable, and maintainable front-end solutions. With robust support for **Tailwind CSS** and **ESLint**, it ensures efficient styling and clean code practices.
+---
+## **Features**  
+- 🚀 **Fast Development Environment**: Powered by Vite for rapid builds and hot module replacement.  
+- 🎨 **Tailwind CSS**: Simplified and responsive UI styling with utility-first CSS.  
+- 🔍 **TypeScript Integration**: Ensures type safety for scalable and maintainable code.  
+- ✅ **Linting with ESLint**: Enforces consistent and error-free code formatting.  
+---
+## **Current Status**  
+**Development Progress**: 20%  
+- Initial project setup with React, TypeScript, and Vite.  
+- Configured Tailwind CSS for styling.  
+- Integrated ESLint for code quality enforcement.
+---
+## **Getting Started**
+### **Prerequisites**
+- Node.js (v16+ recommended)  
+- npm or yarn  
+### **Installation**
+1. Clone the repository:  
+   ```bash
+   git clone https://github.com/Goutamdhanani/thirdeye-vertex.git
+   cd thirdeye-vertex
+   ```
+2. Install dependencies:  
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+3. Start the development server:  
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+---
+## **Roadmap**  
+1. Expand component library with reusable UI elements.  
+2. Add API integrations for dynamic data fetching.  
+3. Implement comprehensive testing (unit and integration).  
+4. Optimize for production builds and deployment.  
+---
+## **Contributing**  
+We welcome contributions! To get started:  
+1. Fork the repository.  
+2. Create a feature branch:  
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Commit your changes and push.  
+4. Open a pull request.
+---
+## **License**  
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
+---
+Feel free to share the specific focus or additional features of the project to refine this template further!
